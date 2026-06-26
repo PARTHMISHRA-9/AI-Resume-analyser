@@ -1,91 +1,59 @@
 import React from 'react';
 import { FiUploadCloud } from 'react-icons/fi';
 
-const DragDropUpload = ({ onFileSelect, accept = '.pdf', maxSize = 10 }) => {
+const DragDropUpload = ({ onFileSelect, accept, maxSize }) => {
   const [isDragging, setIsDragging] = React.useState(false);
-  const fileInputRef = React.useRef(null);
-
-  const handleDragEnter = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-  };
 
   const handleDragOver = (e) => {
     e.preventDefault();
-    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
-    e.stopPropagation();
     setIsDragging(false);
-
     const files = e.dataTransfer.files;
     if (files.length > 0) {
-      handleFiles(files);
+      onFileSelect(files[0]);
     }
   };
 
-  const handleFiles = (files) => {
-    const file = files[0];
-    if (file.size > maxSize * 1024 * 1024) {
-      alert(`File size must be less than ${maxSize}MB`);
-      return;
-    }
-    onFileSelect(file);
-  };
-
-  const handleInputChange = (e) => {
-    if (e.target.files.length > 0) {
-      handleFiles(e.target.files);
+  const handleFileInput = (e) => {
+    const files = e.target.files;
+    if (files.length > 0) {
+      onFileSelect(files[0]);
     }
   };
 
   return (
     <div
-      onDragEnter={handleDragEnter}
-      onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className={`border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all duration-300 ${
+      className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors ${
         isDragging
-          ? 'border-primary-500 bg-primary-50 dark:bg-dark-800'
-          : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-900 hover:border-primary-400'
+          ? 'border-primary-500 bg-primary-50 dark:bg-dark-700'
+          : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-dark-800'
       }`}
-      role="button"
-      tabIndex="0"
-      onKeyDown={(e) => e.key === 'Enter' && fileInputRef.current?.click()}
-      aria-label="Upload resume"
     >
+      <FiUploadCloud className="w-12 h-12 mx-auto text-gray-400 dark:text-gray-500 mb-4" />
+      <h3 className="text-lg font-semibold text-dark-900 dark:text-white mb-2">Drag & drop your resume</h3>
+      <p className="text-gray-600 dark:text-gray-400 mb-4">or click to browse from your computer</p>
       <input
-        ref={fileInputRef}
         type="file"
         accept={accept}
-        onChange={handleInputChange}
+        onChange={handleFileInput}
         className="hidden"
-        aria-hidden="true"
+        id="file-upload"
       />
-
-      <FiUploadCloud
-        size={48}
-        className="mx-auto mb-4 text-primary-500 transition-transform duration-300 hover:scale-110"
-      />
-      <h3 className="text-xl font-bold text-dark-900 dark:text-white mb-2">Upload Your Resume</h3>
-      <p className="text-gray-600 dark:text-gray-400 mb-4">Drag and drop your PDF here, or click to select</p>
-      <button
-        onClick={() => fileInputRef.current?.click()}
-        className="inline-block bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-200"
-      >
-        Choose File
-      </button>
-      <p className="text-sm text-gray-500 dark:text-gray-500 mt-4">Maximum file size: {maxSize}MB</p>
+      <label htmlFor="file-upload" className="inline-block px-6 py-2 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg cursor-pointer transition-colors">
+        Select File
+      </label>
+      <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">Maximum file size: {maxSize}MB</p>
     </div>
   );
 };
