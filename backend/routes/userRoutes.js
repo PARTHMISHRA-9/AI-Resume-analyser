@@ -1,14 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
+const {
+  getProfile,
+  updateProfile,
+  changePassword,
+  deleteAccount,
+  getStats,
+} = require('../controllers/userController');
 
-// Placeholder for user routes
-router.get('/profile', authenticateToken, (req, res) => {
-  res.json({ message: 'User profile route' });
-});
-
-router.put('/profile', authenticateToken, (req, res) => {
-  res.json({ message: 'Update profile route' });
-});
+router.get('/profile', authenticateToken, getProfile);
+router.put('/profile', authenticateToken, updateProfile);
+router.post('/change-password', authenticateToken, changePassword);
+router.delete('/account', authenticateToken, deleteAccount);
+router.get('/stats', authenticateToken, getStats);
 
 module.exports = router;

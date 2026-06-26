@@ -1,22 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
+const upload = require('../config/multer');
+const {
+  uploadResume,
+  getResumes,
+  getResumeById,
+  deleteResume,
+  analyzeResume,
+} = require('../controllers/resumeController');
 
-// Placeholder for resume routes
-router.post('/upload', authenticateToken, (req, res) => {
-  res.json({ message: 'Upload resume route' });
-});
-
-router.get('/', authenticateToken, (req, res) => {
-  res.json({ message: 'Get resumes route' });
-});
-
-router.get('/:id', authenticateToken, (req, res) => {
-  res.json({ message: 'Get resume by ID route' });
-});
-
-router.delete('/:id', authenticateToken, (req, res) => {
-  res.json({ message: 'Delete resume route' });
-});
+router.post('/upload', authenticateToken, upload.single('file'), uploadResume);
+router.get('/', authenticateToken, getResumes);
+router.get('/:id', authenticateToken, getResumeById);
+router.delete('/:id', authenticateToken, deleteResume);
+router.post('/:id/analyze', authenticateToken, analyzeResume);
 
 module.exports = router;
