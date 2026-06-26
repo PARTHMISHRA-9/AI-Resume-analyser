@@ -1,52 +1,52 @@
-import React, { createContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 
-const AnalysisContext = createContext();
+const AnalysisContext = createContext(null);
 
 export const AnalysisProvider = ({ children }) => {
-  const [analysis, setAnalysis] = useState(null);
-  const [currentResume, setCurrentResume] = useState(null);
+  const [currentAnalysis, setCurrentAnalysis] = useState(null);
   const [analysisHistory, setAnalysisHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const setCurrentAnalysis = useCallback((analysisData) => {
-    setAnalysis(analysisData);
+  const setAnalysis = useCallback((analysis) => {
+    setCurrentAnalysis(analysis);
     setError(null);
   }, []);
 
-  const addToHistory = useCallback((entry) => {
-    setAnalysisHistory(prev => [entry, ...prev]);
-  }, []);
-
-  const clearAnalysis = useCallback(() => {
-    setAnalysis(null);
-    setCurrentResume(null);
+  const addToHistory = useCallback((analysis) => {
+    setAnalysisHistory((prev) => [analysis, ...prev]);
   }, []);
 
   const clearHistory = useCallback(() => {
     setAnalysisHistory([]);
   }, []);
 
+  const clearCurrent = useCallback(() => {
+    setCurrentAnalysis(null);
+  }, []);
+
   const value = {
-    analysis,
-    currentResume,
+    currentAnalysis,
     analysisHistory,
     loading,
     error,
-    setCurrentAnalysis,
-    setCurrentResume,
+    setAnalysis,
+    addToHistory,
+    clearHistory,
+    clearCurrent,
     setLoading,
     setError,
-    addToHistory,
-    clearAnalysis,
-    clearHistory,
   };
 
-  return (
-    <AnalysisContext.Provider value={value}>
-      {children}
-    </AnalysisContext.Provider>
-  );
+  return <AnalysisContext.Provider value={value}>{children}</AnalysisContext.Provider>;
 };
 
-export default AnalysisContext;
+export const useAnalysis = () => {
+  const context = useContext(AnalysisContext);
+  if (!context) {
+    throw new Error('useAnalysis must be used within an AnalysisProvider');
+  }
+  return context;
+};
+
+export default useAnalysis;
